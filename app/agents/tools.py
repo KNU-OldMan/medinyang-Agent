@@ -6,29 +6,36 @@ from langchain_core.runnables import RunnableConfig
 from app.core.llm import get_solar_chat
 from app.service.vector_service import VectorService
 from app.repository.client.search_client import SerperSearchClient
+from app.agents.utils import normalize_metadata
+
 
 solar_chat = get_solar_chat()
 search_client = SerperSearchClient()
 
 
 @tool
-def add_to_medical_qa(
-    content: str,
-    config: RunnableConfig,
-    metadata: Optional[Dict[str, Any]] = None,
-) -> str:
+def add_to_medical_qa(content: str, config: RunnableConfig, metadata: Optional[Dict] = None) -> str:
     """
     외부에서 찾은 유용한 의학 정보를 내부 지식 저장소(ChromaDB)에 추가합니다.
+    metadata는 dict 형태이며, 표준 스키마로 정규화됩니다.
     """
     try:
-        vector_service: Optional[VectorService] = config["configurable"].get("vector_service")
+        vector_service: VectorService = config["configurable"].get("vector_service")
         if not vector_service:
             return "Error: VectorService not found in config"
 
-        vector_service.add_documents(
-            documents=[content],
-            metadatas=[metadata or {"source": "google_search"}],
+        meta_in = metadata or {}
+        # 표준 스키마 강제
+        meta = normalize_metadata(
+            source=meta_in.get("source", "google_search"),
+            domain=meta_in.get("domain", "unknown"),
+            title=meta_in.get("title", ""),
+            query=meta_in.get("query", ""),
+            fetched_at=meta_in.get("fetched_at"),
+            extra=meta_in.get("extra"),
         )
+
+        vector_service.add_documents([content], metadatas=[meta])
         return "Successfully added information to knowledge base."
     except Exception as e:
         return f"Error adding to knowledge base: {e}"

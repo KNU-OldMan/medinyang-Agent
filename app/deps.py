@@ -3,6 +3,8 @@ from fastapi import Depends
 from app.repository.vector.vector_repo import VectorRepository, ChromaDBRepository
 from app.service.embedding_service import EmbeddingService
 from app.service.vector_service import VectorService
+from app.service.agents.info_extractor_service import InfoExtractorService
+from app.service.agents.knowledge_augmentor_service import KnowledgeAugmentorService
 
 
 def get_embedding_service() -> EmbeddingService:
@@ -25,3 +27,9 @@ def build_vector_service() -> VectorService:
         vector_repository=ChromaDBRepository(),
         embedding_service=EmbeddingService(),
     )
+
+def get_info_extractor_service() -> InfoExtractorService:
+    return InfoExtractorService()
+
+def get_knowledge_augmentor_service() -> KnowledgeAugmentorService:
+    return KnowledgeAugmentorService()

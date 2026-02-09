@@ -5,7 +5,7 @@ from app.service.embedding_service import EmbeddingService
 from app.service.vector_service import VectorService
 from app.service.agents.info_extractor_service import InfoExtractorService
 from app.service.agents.knowledge_augmentor_service import KnowledgeAugmentorService
-
+from app.service.agents.answer_gen_service import AnswerGenService
 
 def get_embedding_service() -> EmbeddingService:
     return EmbeddingService()
@@ -33,3 +33,6 @@ def get_info_extractor_service() -> InfoExtractorService:
 
 def get_knowledge_augmentor_service() -> KnowledgeAugmentorService:
     return KnowledgeAugmentorService()
+
+def get_answer_gen_service() -> AnswerGenService:
+    return AnswerGenService()

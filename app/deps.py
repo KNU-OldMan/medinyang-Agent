@@ -1,5 +1,6 @@
 from fastapi import Depends
 
+from app.service.agent_service import AgentService
 from app.repository.vector.vector_repo import VectorRepository, ChromaDBRepository
 from app.service.embedding_service import EmbeddingService
 from app.service.vector_service import VectorService
@@ -36,3 +37,17 @@ def get_knowledge_augmentor_service() -> KnowledgeAugmentorService:
 
 def get_answer_gen_service() -> AnswerGenService:
     return AnswerGenService()
+
+
+def get_agent_service(
+    vector_service: VectorService = Depends(get_vector_service),
+    info_extractor_service: InfoExtractorService = Depends(get_info_extractor_service),
+    knowledge_augmentor_service: KnowledgeAugmentorService = Depends(get_knowledge_augmentor_service),
+    answer_gen_service: AnswerGenService = Depends(get_answer_gen_service),
+) -> AgentService:
+    return AgentService(
+        vector_service=vector_service,
+        info_extractor_service=info_extractor_service,
+        knowledge_augmentor_service=knowledge_augmentor_service,
+        answer_gen_service=answer_gen_service,
+    )

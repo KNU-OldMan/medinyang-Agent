@@ -9,7 +9,7 @@ import uvicorn
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 
-from app.api.route.agent_routers import router as agent_router
+from app.api.routes.agent_routers import router as agent_router
 from app.core.seed import seed_data_if_empty
 from app.exceptions import (
     AgentException,

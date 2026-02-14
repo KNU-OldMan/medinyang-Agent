@@ -1,3 +1,90 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+name = "medinyang-agent"
+version = "1.0.0"
+description = "멀티에이전트 의료 상담 시스템 - RAG 기반 의료 정보 제공"
+authors = [{name = "medinyang-agent team", email = "support@medinyang.com"}]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+keywords = ["medical", "healthcare", "ai", "agent", "rag", "langchain"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[tool.poetry]
+name = "medinyang-agent"
+version = "1.0.0"
+description = "멀티에이전트 의료 상담 시스템"
+authors = ["medinyang-agent team <support@medinyang.com>"]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = ">=0.110"
+uvicorn = {version = ">=0.27", extras = ["standard"]}
+python-dotenv = ">=1.0"
+gdown = ">=5.2"
+pydantic = ">=2.6"
+chromadb = ">=0.5"
+langchain = ">=0.2"
+langgraph = ">=0.2"
+langchain-community = ">=0.2"
+langchain-upstage = ">=0.1.7"
+openai = ">=1.50"
+langchain-core = "^0.1"
+langchain-chroma = "^0.1"
+langsmith = "^0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+pytest-cov = "^4.1"
+pytest-asyncio = "^0.21"
+black = "^23.0"
+flake8 = "^6.0"
+mypy = "^1.0"
+isort = "^5.12"
+ruff = "^0.1"
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+known_first_party = ["app"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "chromadb.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "langgraph.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["app"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"

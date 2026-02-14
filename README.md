@@ -552,19 +552,92 @@ def check_extract_status(state):
 
 ```
 - Python 3.10 이상
-- pip (패키지 관리자)
 - Upstage API Key (https://console.upstage.ai/)
 - Git
 ```
 
-### Step 1️⃣: 저장소 클론
+**패키지 관리자 선택:**
+- **pip** (기본): `requirements.txt` 사용
+- **Poetry** (권장): `pyproject.toml` 사용 + 개발 도구 통합
+
+---
+
+### 🔄 Option A: Poetry 사용 (권장 ⭐)
+
+#### Step 1️⃣: 저장소 클론
 
 ```bash
 git clone https://github.com/yourusername/medinyang-Agent.git
 cd medinyang-Agent
 ```
 
-### Step 2️⃣: 가상환경 생성 및 활성화
+#### Step 2️⃣: Poetry 설치
+
+```bash
+pip install poetry
+```
+
+#### Step 3️⃣: 의존성 설치
+
+```bash
+# 모든 의존성 설치 (개발 도구 포함)
+poetry install
+
+# 프로덕션만 (dev 제외)
+poetry install --only main
+```
+
+#### Step 4️⃣: 환경변수 설정
+
+```.env
+UPSTAGE_API_KEY=your_api_key_here
+SERPER_API_KEY=your_serper_key_here        # 외부 검색 사용 시
+LOG_LEVEL=INFO
+```
+
+#### Step 5️⃣: 서버 시작
+
+```bash
+# Poetry 환경에서 실행
+poetry run uvicorn app.main:app --reload --port 8001
+
+# Shell 진입 (반복 실행 시 편함)
+poetry shell
+uvicorn app.main:app --reload --port 8001
+```
+
+#### Step 6️⃣: 초기화 확인
+
+```bash
+poetry run python -c "from app.main import app; print('✅ Import successful')"
+
+# 또는 curl
+curl http://127.0.0.1:8001/agent/health
+```
+
+**Poetry 주요 명령어:**
+```bash
+poetry install              # 의존성 설치
+poetry add langchain        # 새 패키지 추가
+poetry run pytest           # 테스트 실행
+poetry run black .          # 코드 포매팅
+poetry run mypy app         # 타입 검사
+poetry build                # 빌드
+poetry publish              # PyPI 배포
+```
+
+---
+
+### 🔄 Option B: pip 사용
+
+#### Step 1️⃣: 저장소 클론
+
+```bash
+git clone https://github.com/yourusername/medinyang-Agent.git
+cd medinyang-Agent
+```
+
+#### Step 2️⃣: 가상환경 생성 및 활성화
 
 **Windows:**
 ```bash
@@ -578,7 +651,7 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### Step 3️⃣: 의존성 설치
+#### Step 3️⃣: 의존성 설치
 
 ```bash
 # 프로덕션 의존성
@@ -588,22 +661,15 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
-### Step 4️⃣: 환경변수 설정
+#### Step 4️⃣: 환경변수 설정
 
 ```.env
-# .env 파일 생성
 UPSTAGE_API_KEY=your_api_key_here
-
-# 선택사항:
 SERPER_API_KEY=your_serper_key_here        # 외부 검색 사용 시
-LOG_LEVEL=INFO                             # DEBUG, INFO, WARNING
+LOG_LEVEL=INFO
 ```
 
-**API Key 획득:**
-- Upstage: https://console.upstage.ai/ → API Keys
-- Serper: https://serper.dev/ → Free trial
-
-### Step 5️⃣: 서버 시작
+#### Step 5️⃣: 서버 시작
 
 ```bash
 # 기본 실행
@@ -612,30 +678,83 @@ uvicorn app.main:app --reload --port 8001
 # 다른 포트에서 실행
 uvicorn app.main:app --reload --port 8080
 
-# 프로덕션 모드 (자동 재시작 없음)
+# 프로덕션 모드
 uvicorn app.main:app --port 8001 --workers 4
 ```
 
-### Step 6️⃣: 초기화 확인
+#### Step 6️⃣: 초기화 확인
 
 ```bash
-# 1️⃣ 헬스 체크
+curl http://127.0.0.1:8001/agent/health
+```
+
+---
+
+### 📋 API Key 획득
+
+**Upstage:**
+1. https://console.upstage.ai/ 접속
+2. 회원가입/로그인
+3. "API Keys" 메뉴 클릭
+4. 키 복사해서 `.env`에 설정
+
+**Serper (선택사항):**
+1. https://serper.dev/ 접속
+2. 회원가입
+3. 무료 크레딧 100개 자동 제공
+4. API 키 복사해서 `.env`에 설정
+
+---
+
+### ✅ 헬스 체크 & 초기화 확인
+
+```bash
+# 헬스 체크
 curl http://127.0.0.1:8001/agent/health
 
-# 2️⃣ 의료 데이터 로드 상태 확인
+# 시딩 상태 확인
 curl http://127.0.0.1:8001/agent/seed-status
 
-# 3️⃣ Swagger 문서 확인
+# Swagger 문서
 http://127.0.0.1:8001/docs
 ```
 
-**예상 출력:**
+**예상 응답:**
 ```json
 {
   "status": "healthy",
   "message": "Agent service is running"
 }
 ```
+
+---
+
+### 🔧 Poetry vs pip 비교
+
+| 항목 | Poetry | pip |
+|------|--------|-----|
+| 설정 파일 | `pyproject.toml` | `requirements.txt` |
+| 개발 도구 | 통합됨 ✅ | 별도 설치 |
+| 의존성 잠금 | `poetry.lock` 생성 | `pip freeze` 권장 |
+| 가상환경 | 자동 관리 | 수동 관리 |
+| 패키지 배포 | 내장 기능 ✅ | 별도 도구 필요 |
+| 학습곡선 | 중간 | 낮음 |
+
+**권장사항:**
+- 팀 프로젝트 → **Poetry** (일관성, 재현성)
+- 단순 스크립트 → **pip** (빠름)
+
+---
+
+## 💬 API 사용법
+
+### 📚 Swagger UI 사용 (권장)
+
+```
+http://127.0.0.1:8001/docs
+```
+
+### 1️⃣ 일반 채팅 (동기식)
 
 ---
 
@@ -769,12 +888,130 @@ curl http://127.0.0.1:8001/agent/knowledge/stats
 
 ## 👨‍💻 개발 가이드
 
+### 🎵 Poetry 개발 워크플로우
+
+#### 개발 환경 초기 설정
+
+```bash
+# 1️⃣ 프로젝트 클론
+git clone https://github.com/yourusername/medinyang-Agent.git
+cd medinyang-Agent
+
+# 2️⃣ Poetry 설치 (처음 한 번만)
+pip install poetry
+
+# 3️⃣ 의존성 설치 (개발 도구 포함)
+poetry install
+
+# 4️⃣ Poetry shell 진입 (권장)
+poetry shell
+```
+
+#### 주요 개발 도구 사용법
+
+```bash
+# 📝 코드 포매팅 (Black)
+poetry run black .
+poetry run black app/service/
+
+# 📦 임포트 정렬 (isort)
+poetry run isort app/
+
+# ✅ 코드 린트 검사 (ruff)
+poetry run ruff check app/
+poetry run ruff check app/ --fix  # 자동 수정
+
+# 🔍 타입 체크 (mypy)
+poetry run mypy app/
+
+# 🧪 테스트 실행 (pytest)
+poetry run pytest
+poetry run pytest tests/test_health.py -v
+
+# 📊 테스트 커버리지
+poetry run pytest --cov=app tests/
+
+# 🔗 모든 검사 한 번에
+poetry run black . && \
+poetry run isort . && \
+poetry run ruff check . && \
+poetry run mypy . && \
+poetry run pytest
+```
+
+#### 새 패키지 추가
+
+```bash
+# 프로덕션 패키지 추가
+poetry add requests
+
+# 개발 패키지만 추가
+poetry add --group dev pytest-xdist
+
+# 특정 버전 지정
+poetry add "langchain>=0.3"
+```
+
+#### 의존성 관리
+
+```bash
+# 의존성 업데이트 (보수적)
+poetry update
+
+# 특정 패키지만 업데이트
+poetry update langchain
+
+# poetry.lock 파일 생성
+poetry lock --no-update
+```
+
+#### 프로덕션 배포 준비
+
+```bash
+# 개발 의존성 없이 설치 (프로덕션 서버)
+poetry install --only main
+
+# 빌드
+poetry build
+
+# PyPI에 배포
+poetry publish
+```
+
+---
+
+### 📋 pyproject.toml 구조
+
+**현재 설정 항목:**
+
+| 섹션 | 목적 |
+|------|------|
+| `[build-system]` | Poetry 빌드 설정 |
+| `[project]` | PyPI 메타데이터 |
+| `[tool.poetry.dependencies]` | 운영 의존성 |
+| `[tool.poetry.group.dev.dependencies]` | 개발 도구 |
+| `[tool.black]` | Black 포매팅 설정 |
+| `[tool.mypy]` | mypy 타입 검사 설정 |
+| `[tool.pytest.ini_options]` | pytest 테스트 설정 |
+| `[tool.isort]` | isort 임포트 정렬 설정 |
+| `[tool.ruff]` | ruff 린트 설정 |
+
+**버전 명시 규칙:**
+```toml
+python = "^3.10"           # 3.10 이상, 4.0 미만
+pytest = "^7.4"            # 7.4 이상, 8.0 미만
+langchain = ">=0.2"         # 0.2 이상 (상한 없음)
+fastapi = ">=0.110"         # 0.110 이상 (상한 없음)
+```
+
+---
+
 ### 프로젝트 컨벤션
 
 #### 파일 네이밍
 ```
 파일        | 규칙           | 예시
-----------|----------------|------------------
+----------|--------------|-----------------
 모듈      | snake_case     | agent_service.py
 클래스    | PascalCase     | AgentService
 메서드    | snake_case     | run_agent()
@@ -799,6 +1036,35 @@ def run_agent(inputs):
         에이전트 실행 결과
     """
 ```
+
+#### Black/isort 자동 적용
+
+```python
+# Before
+from app.service import AgentService
+import os
+import json
+from typing import Dict
+
+
+class Agent:
+    def __init__(self):
+        pass
+        
+# After (poetry run black . && poetry run isort .)
+import json
+import os
+from typing import Dict
+
+from app.service import AgentService
+
+
+class Agent:
+    def __init__(self):
+        pass
+```
+
+
 
 ### 새로운 에이전트 추가 (체크리스트)
 

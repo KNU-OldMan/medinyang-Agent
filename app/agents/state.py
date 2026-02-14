@@ -18,9 +18,24 @@ class AnswerGenAgentState(TypedDict):
 
 class MainState(TypedDict):
     user_query: str
-    build_logs: List[BaseMessage]
-    augment_logs: List[BaseMessage]
-    extract_logs: List[BaseMessage]
+    
+    # routing
+    route_next: str
+    route_confidence: float
+    route_reason: str
+
+    # medical pipline logs
     answer_logs: Annotated[List[BaseMessage], add_messages]
+    extract_logs: List[BaseMessage]
+    augment_logs: List[BaseMessage]
+
+    build_logs: List[BaseMessage]
     process_status: str
     loop_count: int
+
+class ChatFilterState(TypedDict, total=False):
+    message: List[BaseMessage]
+
+    next: str
+    confidence: float
+    reason: str
